@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bill Splitter</title>
+<style>
+:root{--bg:#f2f7f6;--card:#fff;--tx:#16211f;--mut:#62736f;--bd:#e1e8e6;--ac:#0d9488;--act:#fff;--warn:#b45309;--g:linear-gradient(135deg,#0f766e,#14b8a6);--sh:0 1px 2px rgba(16,40,36,.06),0 6px 18px rgba(16,40,36,.06);--shh:0 2px 4px rgba(16,40,36,.08),0 14px 30px rgba(16,40,36,.14);--soft:rgba(13,148,136,.1);
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1413;--card:#17211f;--tx:#ecf3f1;--mut:#93a6a2;--bd:#2a3836;--ac:#2dd4bf;--act:#052e2a;--warn:#fbbf24;--g:linear-gradient(135deg,#14b8a6,#5eead4);--sh:0 1px 2px rgba(0,0,0,.4),0 6px 18px rgba(0,0,0,.3);--shh:0 2px 4px rgba(0,0,0,.5),0 14px 30px rgba(0,0,0,.45);--soft:rgba(45,212,191,.12);color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0d1413;--card:#17211f;--tx:#ecf3f1;--mut:#93a6a2;--bd:#2a3836;--ac:#2dd4bf;--act:#052e2a;--warn:#fbbf24;--g:linear-gradient(135deg,#14b8a6,#5eead4);--sh:0 1px 2px rgba(0,0,0,.4),0 6px 18px rgba(0,0,0,.3);--shh:0 2px 4px rgba(0,0,0,.5),0 14px 30px rgba(0,0,0,.45);--soft:rgba(45,212,191,.12);color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:600px;margin:0 auto;padding:14px 14px 90px}
+.prog{height:6px;background:var(--bd);border-radius:9px;overflow:hidden;margin:4px 0 6px}
+.prog i{display:block;height:100%;background:var(--ac);transition:width .25s}
+.stepno{font-size:13px;color:var(--mut);margin-bottom:12px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:18px;margin-bottom:14px}
+.card.head{border-top:8px solid var(--ac)}
+h1{font-size:24px;margin:0 0 4px}h2{font-size:16px;margin:0 0 10px}
+.sub{color:var(--mut);font-size:14px;margin:0}
+button,input{font:inherit;color:inherit}
+input[type=text],input[type=number]{background:transparent;border:0;border-bottom:1px solid var(--bd);padding:8px 2px;min-width:0;border-radius:0}
+input:focus{outline:0;border-bottom:2px solid var(--ac)}
+.btn{background:var(--ac);color:var(--act);border:0;border-radius:10px;padding:11px 18px;font-weight:600;cursor:pointer}
+.btn.alt{background:transparent;color:var(--ac);border:1px solid var(--bd)}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.chip{border:1px solid var(--bd);background:transparent;border-radius:99px;padding:5px 12px;font-size:14px;cursor:pointer}
+.chip.on{background:var(--ac);color:var(--act);border-color:var(--ac)}
+.item{display:flex;gap:8px;align-items:center;padding:4px 0}
+.item input:first-child{flex:1}.item input[type=number]{width:88px;text-align:right}
+.x{background:none;border:0;color:var(--mut);font-size:22px;cursor:pointer;padding:0 6px}
+.drop{border:2px dashed var(--bd);border-radius:12px;padding:22px;text-align:center}
+#preview{max-width:100%;max-height:220px;border-radius:10px;display:none;margin:12px auto 0}
+#status{font-size:14px;color:var(--mut);margin-top:10px;text-align:center}
+.warn{color:var(--warn);font-size:14px;margin-top:8px}
+.tot{display:flex;justify-content:space-between;padding:5px 0}
+.tot.big{font-weight:700;font-size:20px;border-top:1px solid var(--bd);margin-top:6px;padding-top:10px}
+.pc{border-top:1px solid var(--bd);padding:12px 0}.pc:first-child{border-top:0}
+.pc .n{display:flex;justify-content:space-between;font-weight:700;font-size:17px}
+.pc .d{color:var(--mut);font-size:13px;margin-top:2px}
+.nav{position:fixed;left:0;right:0;bottom:0;background:var(--bg);border-top:1px solid var(--bd);padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px))}
+.nav div{max-width:600px;margin:0 auto;display:flex;justify-content:space-between;gap:10px}
+.pg{display:none}.pg.on{display:block}
+label.chk{display:flex;gap:8px;align-items:center;font-size:14px;margin-top:12px}
+.rg{margin-bottom:14px}
+input[type=range]{width:100%;height:32px;accent-color:var(--ac);cursor:pointer;margin:0}
+.ticks{display:flex;justify-content:space-between;font-size:12px;color:var(--mut)}
+.hero{text-align:center;padding:22px 18px}
+.hero .amt{font-size:40px;font-weight:800;margin:4px 0 12px;letter-spacing:-.5px}
+.brk{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--mut)}
+.brk b{color:var(--tx);font-weight:600}
+.pcard{padding:0}
+.pcard summary{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;list-style:none}
+.pcard summary::-webkit-details-marker{display:none}
+.pcard summary::after{content:'\203A';color:var(--mut);font-size:22px;transition:transform .2s}
+.pcard[open] summary::after{transform:rotate(90deg)}
+.av{width:38px;height:38px;border-radius:50%;background:var(--ac);color:var(--act);display:grid;place-items:center;font-weight:700;flex:none}
+.pn{flex:1;font-weight:600;font-size:17px}
+.pa{font-weight:800;font-size:18px}
+.dt{border-top:1px solid var(--bd);padding:10px 16px 14px;font-size:14px}
+.ln{display:flex;justify-content:space-between;padding:3px 0;color:var(--mut)}
+.ln.sep{border-top:1px dashed var(--bd);margin-top:6px;padding-top:8px}
+body{background:radial-gradient(900px 380px at 50% -100px,var(--soft),transparent),var(--bg);min-height:100vh}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.topbar .stepno{margin:0}
+.theme{background:var(--card);border:1px solid var(--bd);border-radius:50%;width:36px;height:36px;cursor:pointer;box-shadow:var(--sh);transition:transform .18s,border-color .18s}
+.theme:hover{transform:rotate(20deg) scale(1.08);border-color:var(--ac)}
+.prog i{background:var(--g)}
+.card{border-radius:18px;box-shadow:var(--sh);transition:transform .18s,box-shadow .18s,border-color .18s}
+@media (hover:hover){.card:hover{transform:translateY(-2px);box-shadow:var(--shh);border-color:var(--ac)}}
+.card.head{background:var(--g);color:#fff;border:0}
+.card.head h1{letter-spacing:-.3px}
+.card.head .sub{color:rgba(255,255,255,.88)}
+.card.head:hover{border:0}
+.btn{background:var(--g);border-radius:12px;box-shadow:0 4px 14px var(--soft);transition:transform .15s,box-shadow .15s,filter .15s}
+.btn:hover{transform:translateY(-1px);box-shadow:var(--shh);filter:brightness(1.06)}
+.btn:active{transform:scale(.97)}
+.btn.alt{background:var(--card);color:var(--ac);border:1px solid var(--bd);box-shadow:none}
+.btn.alt:hover{background:var(--soft);border-color:var(--ac);filter:none}
+.chip{transition:background .15s,border-color .15s,transform .15s}
+.chip:hover{border-color:var(--ac);background:var(--soft);transform:translateY(-1px)}
+.chip.on{background:var(--g);border-color:transparent}
+.chip.on:hover{filter:brightness(1.08);background:var(--g)}
+input[type=text],input[type=number]{border:1px solid var(--bd);border-radius:10px;padding:9px 11px;background:var(--card);transition:border-color .15s,box-shadow .15s}
+input[type=text]:focus,input[type=number]:focus{border:1px solid var(--ac);box-shadow:0 0 0 3px var(--soft)}
+.item{border-radius:10px;padding:4px;transition:background .15s}.item:hover{background:var(--soft)}
+.x{border-radius:50%;transition:color .15s,background .15s}.x:hover{color:#dc2626;background:rgba(220,38,38,.1)}
+.drop{border-radius:16px;background:var(--soft);transition:border-color .2s}.drop:hover{border-color:var(--ac)}
+.nav{background:color-mix(in srgb,var(--bg) 82%,transparent);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+.pcard summary{border-radius:18px;transition:background .15s}.pcard summary:hover{background:var(--soft)}
+.av{background:var(--g)}
+.hero{background:var(--card)}
+.hero .amt{background:var(--g);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+.pg.on{animation:fin .28s ease}
+@keyframes fin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.adj{margin-top:14px}.ar{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:5px 0}
+.ai{display:flex;gap:6px}.ai input{width:96px;text-align:right}
+select{font:inherit;color:inherit;background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:8px;cursor:pointer}
+select:focus{outline:0;border-color:var(--ac);box-shadow:0 0 0 3px var(--soft)}
+.uw{flex-basis:100%;display:grid;gap:6px;margin-top:4px}
+.ust{display:flex;align-items:center;gap:10px;background:var(--soft);border-radius:10px;padding:6px 10px}
+.ust span{flex:1;font-size:14px}.ust b{min-width:20px;text-align:center}
+.sb{width:30px;height:30px;border-radius:50%;border:1px solid var(--bd);background:var(--card);color:var(--ac);font-size:18px;line-height:1;cursor:pointer;transition:background .15s,border-color .15s}
+.sb:hover{border-color:var(--ac);background:var(--soft)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+<div class="prog"><i id="bar"></i></div>
+<div class="topbar"><div class="stepno" id="stepno"></div><button class="theme" id="theme" aria-label="Switch light or dark mode">🌓</button></div>
+
+<section class="pg" id="p0">
+<div class="card head"><h1>Upload your receipt</h1><p class="sub">Take a photo or pick a picture. We will read the items for you.</p></div>
+<div class="card">
+<div class="drop">
+<button class="btn" id="upBtn">📷 Add receipt photo</button>
+<img id="preview" alt="Receipt preview">
+<div id="status"></div>
+</div>
+<input type="file" id="upIn" accept="image/*" hidden>
+</div>
+<p class="sub" style="text-align:center">No photo? Press Next and enter items yourself.</p>
+</section>
+
+<section class="pg" id="p1">
+<div class="card head"><h1>Check the items</h1><p class="sub">Fix any name or price, and set service charge and tax.</p></div>
+<div class="card"><h2>Items</h2><div id="items"></div>
+<button class="btn alt" id="addItem" style="margin-top:8px">+ Add item</button></div>
+<div class="card"><h2>Charges</h2>
+<div class="rg"><div class="tot"><span>Service charge</span><b id="scv">10%</b></div><input type="range" id="sc" value="10" min="0" max="20" step="0.5"><div class="ticks"><span>0%</span><span>10%</span><span>20%</span></div></div>
+<div class="rg"><div class="tot"><span>SST</span><b id="txv">6%</b></div><input type="range" id="tx" value="6" min="0" max="15" step="0.5"><div class="ticks"><span>0%</span><span>8%</span><span>15%</span></div></div>
+<label class="chk"><input type="checkbox" id="onSc" checked> Charge SST on subtotal + service charge</label>
+<div class="adj"><div class="ar"><span>Discount</span><div class="ai"><input type="number" id="dv" value="0" min="0" step="0.01"><select id="du"><option value="rm">RM</option><option value="pct">%</option></select></div></div>
+<div class="ar"><span>Tip</span><div class="ai"><input type="number" id="tpv" value="0" min="0" step="0.01"><select id="tpu"><option value="rm">RM</option><option value="pct">%</option></select></div></div>
+<p class="sub">Discount comes off before service charge and SST. Tip is shared by what each person ordered.</p></div>
+<div style="margin-top:14px">
+<div class="tot"><span>Subtotal</span><span id="aSub"></span></div>
+<div class="tot"><span>Discount</span><span id="aDi"></span></div>
+<div class="tot"><span>Service charge</span><span id="aSc"></span></div>
+<div class="tot"><span>SST</span><span id="aTx"></span></div>
+<div class="tot"><span>Tip</span><span id="aTp"></span></div>
+<div class="tot big"><span>Total</span><span id="aAll"></span></div></div>
+<div class="warn" id="err1"></div></div>
+</section>
+
+<section class="pg" id="p2">
+<div class="card head"><h1>Who is splitting?</h1><p class="sub">Add everyone, then tap names to choose who shared each item. By default every item is split equally.</p></div>
+<div class="card"><div class="row" style="margin-bottom:12px"><input type="text" id="pName" placeholder="Name" style="flex:1"><button class="btn" id="pAdd">Add</button></div>
+<div class="row" id="people"></div><div class="warn" id="err2"></div></div>
+<div class="card"><h2>Who shared what?</h2><div id="assign"></div></div>
+</section>
+
+<section class="pg" id="p3">
+<div class="card head"><h1>Summary</h1><p class="sub">Here is what everyone owes.</p></div>
+<div class="card hero"><div class="sub">Total bill</div><div class="amt" id="tAll"></div><div class="brk"><span>Subtotal <b id="tSub"></b></span><span>Service <b id="tSc"></b></span><span>SST <b id="tTx"></b></span><span id="tDw" hidden>Discount <b id="tDi"></b></span><span id="tTw" hidden>Tip <b id="tTp"></b></span></div></div>
+<h2 style="margin:4px 4px 10px">Each person pays</h2>
+<div id="perPerson"></div>
+<div class="row" style="margin:6px 0 14px"><button class="btn" id="copyBtn" style="flex:1">📋 Copy summary</button><button class="btn alt" id="shareBtn" style="flex:1">📤 Share</button></div>
+<button class="btn alt" id="reset" style="width:100%">Start a new bill</button>
+</section>
+</main>
+<div class="nav"><div><button class="btn alt" id="back">Back</button><button class="btn" id="next">Next</button></div></div>
+
+<script>
+(function(){
+var people=[],items=[],uid=0,step=0,LAST=3,shareText='';
+var $=function(id){return document.getElementById(id)};
+var rm=function(n){return 'RM '+(Math.round(n*100)/100).toFixed(2)};
+var esc=function(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})};
+var inWho=function(it,id){return it.who===null||it.who.indexOf(id)>-1};
+var ids=function(){return people.map(function(p){return p.id})};
+
+function go(n){
+  step=Math.max(0,Math.min(LAST,n));
+  for(var i=0;i<=LAST;i++)$('p'+i).classList.toggle('on',i===step);
+  $('bar').style.width=((step+1)/(LAST+1)*100)+'%';
+  $('stepno').textContent='Step '+(step+1)+' of '+(LAST+1);
+  $('back').style.visibility=step===0?'hidden':'visible';
+  $('next').style.display=step===LAST?'none':'';
+  if(step===1){renderItems();}
+  if(step===2){renderPeople();renderAssign();}
+  if(step===3){summary();}
+  window.scrollTo(0,0);
+}
+$('back').onclick=function(){go(step-1)};
+$('next').onclick=function(){
+  if(step===1){
+    items=items.filter(function(i){return i.name.trim()||i.price>0});
+    if(!items.length){$('err1').textContent='Add at least one item to continue.';return;}
+    $('err1').textContent='';
+  }
+  if(step===2&&!people.length){$('err2').textContent='Add at least one person to continue.';return;}
+  go(step+1);
+};
+$('reset').onclick=function(){people=[];items=[];$('preview').style.display='none';$('status').textContent='';$('dv').value=0;$('tpv').value=0;go(0)};
+
+function charges(s){
+  var sc=parseFloat($('sc').value)||0,tx=parseFloat($('tx').value)||0,c=s*sc/100;
+  return {c:c,t:(s+($('onSc').checked?c:0))*tx/100};
+}
+function adj(s,sub){
+  var dv=parseFloat($('dv').value)||0,tv=parseFloat($('tpv').value)||0;
+  var D=$('du').value==='pct'?sub*Math.min(dv,100)/100:Math.min(dv,sub);
+  var d=sub>0?D*s/sub:0,n=s-d,q=charges(n),base=n+q.c+q.t;
+  var tip=$('tpu').value==='pct'?base*tv/100:(sub>0?tv*s/sub:0);
+  return {d:d,c:q.c,t:q.t,tip:tip,total:base+tip};
+}
+function renderItems(){
+  var box=$('items');
+  box.innerHTML=items.map(function(it,i){
+    return '<div class="item"><input type="text" data-n="'+i+'" value="'+esc(it.name)+'" placeholder="Item name"><input type="number" data-p="'+i+'" value="'+it.price+'" step="0.01" min="0"><button class="x" data-d="'+i+'">×</button></div>';
+  }).join('')||'<p class="sub">No items yet. Add one below.</p>';
+  box.querySelectorAll('[data-n]').forEach(function(e){e.oninput=function(){items[+e.dataset.n].name=e.value}});
+  box.querySelectorAll('[data-p]').forEach(function(e){e.oninput=function(){items[+e.dataset.p].price=parseFloat(e.value)||0;calc()}});
+  box.querySelectorAll('[data-d]').forEach(function(e){e.onclick=function(){items.splice(+e.dataset.d,1);renderItems()}});
+  calc();
+}
+function calc(){
+  $('scv').textContent=(parseFloat($('sc').value)||0)+'%';$('txv').textContent=(parseFloat($('tx').value)||0)+'%';
+  var s=items.reduce(function(a,i){return a+i.price},0),r=adj(s,s);
+  $('aSub').textContent=rm(s);$('aDi').textContent='− '+rm(r.d);$('aSc').textContent=rm(r.c);$('aTx').textContent=rm(r.t);$('aTp').textContent=rm(r.tip);$('aAll').textContent=rm(r.total);
+}
+$('addItem').onclick=function(){items.push({name:'',price:0,who:null});renderItems();var n=$('items').querySelectorAll('[data-n]');n[n.length-1].focus()};
+['sc','tx','dv','tpv'].forEach(function(id){$(id).oninput=calc});['onSc','du','tpu'].forEach(function(id){$(id).onchange=calc});
+
+function renderPeople(){
+  $('people').innerHTML=people.map(function(p){return '<span class="chip on">'+esc(p.name)+' <span data-r="'+p.id+'" style="cursor:pointer">×</span></span>'}).join('')||'<span class="sub">No one yet</span>';
+  $('people').querySelectorAll('[data-r]').forEach(function(e){e.onclick=function(){
+    var id=+e.dataset.r;people=people.filter(function(p){return p.id!==id});
+    items.forEach(function(i){if(i.who)i.who=i.who.filter(function(w){return w!==id})});
+    renderPeople();renderAssign();}});
+}
+function renderAssign(){
+  $('assign').innerHTML=items.map(function(it,i){
+    var chips=people.map(function(p){return '<button class="chip'+(inWho(it,p.id)?' on':'')+'" data-i="'+i+'" data-w="'+p.id+'">'+esc(p.name)+'</button>'}).join('');
+    var more='';
+    if(people.length>1){
+      more='<button class="chip'+(it.uneven?' on':'')+'" data-u="'+i+'">⚖️ Uneven</button>';
+      if(it.uneven){var sel=it.who===null?ids():it.who;more+='<div class="uw">'+people.filter(function(p){return sel.indexOf(p.id)>-1}).map(function(p){var n=(it.w&&it.w[p.id])||1;return '<div class="ust"><span>'+esc(p.name)+'</span><button class="sb" data-s="'+i+'" data-id="'+p.id+'" data-sd="-1">−</button><b>'+n+'</b><button class="sb" data-s="'+i+'" data-id="'+p.id+'" data-sd="1">+</button></div>'}).join('')+'</div>';}
+    }
+    return '<div class="pc"><div class="n"><span>'+esc(it.name||'Item')+'</span><span>'+rm(it.price)+'</span></div><div class="row" style="margin-top:8px">'+(chips||'<span class="sub">Add people above</span>')+more+'</div></div>';
+  }).join('');
+  $('assign').querySelectorAll('[data-w]').forEach(function(e){e.onclick=function(){
+    var it=items[+e.dataset.i],id=+e.dataset.w;
+    var cur=it.who===null?ids():it.who.slice(),k=cur.indexOf(id);
+    if(k>-1)cur.splice(k,1);else cur.push(id);
+    it.who=cur.length===people.length?null:cur;renderAssign();}});
+  $('assign').querySelectorAll('[data-u]').forEach(function(e){e.onclick=function(){var it=items[+e.dataset.u];it.uneven=!it.uneven;it.w=it.w||{};renderAssign();}});
+  $('assign').querySelectorAll('[data-sd]').forEach(function(e){e.onclick=function(){var it=items[+e.dataset.s],id=+e.dataset.id;it.w=it.w||{};it.w[id]=Math.max(1,(it.w[id]||1)+(+e.dataset.sd));renderAssign();}});
+}
+function addPerson(){
+  var v=$('pName').value.trim();if(!v)return;
+  people.push({id:++uid,name:v});$('pName').value='';$('err2').textContent='';
+  renderPeople();renderAssign();$('pName').focus();
+}
+$('pAdd').onclick=addPerson;
+$('pName').onkeydown=function(e){if(e.key==='Enter')addPerson()};
+
+function summary(){
+  var per={},lines={},sub=0,un=0;
+  people.forEach(function(p){per[p.id]=0;lines[p.id]=[]});
+  items.forEach(function(it){
+    sub+=it.price;
+    var w=it.who===null?ids():it.who;
+    if(!w.length){un+=it.price;return;}
+    var wt=w.map(function(id){return it.uneven&&it.w&&it.w[id]||1}),tw=wt.reduce(function(a,b){return a+b},0);
+    w.forEach(function(id,k){var a=it.price*wt[k]/tw;per[id]+=a;lines[id].push({n:it.name||'Item',a:a,f:it.uneven?wt[k]+' of '+tw:(w.length>1?'1/'+w.length:'')})});
+  });
+  var r=adj(sub,sub);
+  $('tSub').textContent=rm(sub);$('tSc').textContent=rm(r.c);$('tTx').textContent=rm(r.t);$('tAll').textContent=rm(r.total);
+  $('tDw').hidden=!(r.d>0.004);$('tDi').textContent='− '+rm(r.d);$('tTw').hidden=!(r.tip>0.004);$('tTp').textContent=rm(r.tip);
+  shareText='🧾 Bill split\n'+people.map(function(p){return p.name+': '+rm(adj(per[p.id],sub).total)}).join('\n')+'\n—\nTotal: '+rm(r.total)+' ('+(parseFloat($('sc').value)||0)+'% service, '+(parseFloat($('tx').value)||0)+'% SST'+(r.d>0.004?', discount '+rm(r.d):'')+(r.tip>0.004?', tip '+rm(r.tip):'')+')';
+  $('perPerson').innerHTML=people.map(function(p){
+    var q=adj(per[p.id],sub);
+    var rows=lines[p.id].map(function(l){return '<div class="ln"><span>'+esc(l.n)+(l.f?' ('+l.f+')':'')+'</span><span>'+rm(l.a)+'</span></div>'}).join('')||'<div class="ln"><span>No items</span><span></span></div>';
+    return '<details class="card pcard"><summary><span class="av">'+esc(p.name.charAt(0).toUpperCase())+'</span><span class="pn">'+esc(p.name)+'</span><span class="pa">'+rm(q.total)+'</span></summary><div class="dt">'+rows+''+(q.d>0.004?'<div class="ln"><span>Discount</span><span>− '+rm(q.d)+'</span></div>':'')+'<div class="ln sep"><span>Service charge</span><span>'+rm(q.c)+'</span></div><div class="ln"><span>SST</span><span>'+rm(q.t)+'</span></div>'+(q.tip>0.004?'<div class="ln"><span>Tip</span><span>'+rm(q.tip)+'</span></div>':'')+'</div></details>';
+  }).join('')+(un>0?'<div class="warn">'+rm(un)+' of items is not assigned to anyone, so it is not included in the per-person totals.</div>':'');
+}
+
+function shrink(file){
+  return new Promise(function(res,rej){
+    var url=URL.createObjectURL(file),img=new Image();
+    img.onload=function(){
+      var s=Math.min(1,1600/Math.max(img.width,img.height)),c=document.createElement('canvas');
+      c.width=Math.round(img.width*s);c.height=Math.round(img.height*s);
+      c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+      c.toBlob(function(b){b?res({blob:b,url:URL.createObjectURL(b)}):rej(new Error('x'))},'image/jpeg',0.85);
+      URL.revokeObjectURL(url);
+    };
+    img.onerror=function(){rej(new Error('x'))};
+    img.src=url;
+  });
+}
+function parseReceipt(text){
+  var items=[],sc=null,tx=null;
+  text=String(text).replace(/(\d),(\d{3})(?=\D|$)/g,'$1$2');
+  var skip=/\b(sub\s*-?\s*total|total|service|svc|s\/c|sst|tax|gst|rounding|round|rounded|change|cash|visa|mastercard|card|tender|paid|balance|discount|due|payment|tip|voucher)\b/i;
+  var junk=/\b(tel|phone|invoice|receipt|table|date|time|server|cashier|bill\s*no|order|thank|wifi|reg\s*no|address|jalan|www)\b|@/i;
+  text.split(/\r?\n/).forEach(function(raw){
+    var line=raw.replace(/\s+/g,' ').trim(),m;
+    if(line.length<3)return;
+    if(m=line.match(/(?:service|svc|s\/c)[^0-9]*(\d{1,2}(?:\.\d+)?)\s*%/i)){if(sc===null)sc=parseFloat(m[1]);}
+    if(m=line.match(/(?:sst|tax|gst)[^0-9]*(\d{1,2}(?:\.\d+)?)\s*%/i)){if(tx===null)tx=parseFloat(m[1]);}
+    if(skip.test(line)||junk.test(line))return;
+    var p=line.match(/(?:RM\s*)?(\d{1,4}[.,]\d{2})\s*[A-Za-z]{0,2}$/);
+    if(!p)return;
+    var price=parseFloat(p[1].replace(',','.'));
+    if(!(price>0)||price>5000)return;
+    var name=line.slice(0,p.index).replace(/(\s+(?:RM\s*)?\d+[.,]\d{2})+\s*$/i,'').replace(/[|_~*#]+/g,' ').trim(),qty=1,q;
+    if(q=name.match(/^(\d{1,2})\s*[xX]?\s+(?=\S)/)){qty=+q[1];name=name.slice(q[0].length);}
+    else if(q=name.match(/\s+[xX]?(\d{1,2})$/)){qty=+q[1];name=name.slice(0,q.index);}
+    name=name.replace(/^[^A-Za-z0-9]+/,'').trim();
+    if(!/[A-Za-z]{2,}/.test(name))return;
+    items.push({name:qty>1?qty+'x '+name:name,price:price,who:null});
+  });
+  return {items:items,sc:sc,tx:tx};
+}
+function loadScript(src){return new Promise(function(res,rej){var s=document.createElement('script');s.src=src;s.onload=res;s.onerror=function(){rej(new Error('load'))};document.head.appendChild(s)})}
+function prep(blob){
+  return new Promise(function(res,rej){
+    var url=URL.createObjectURL(blob),img=new Image();
+    img.onload=function(){
+      var c=document.createElement('canvas');c.width=img.width;c.height=img.height;
+      var x=c.getContext('2d');x.drawImage(img,0,0);
+      var d=x.getImageData(0,0,c.width,c.height),a=d.data;
+      for(var i=0;i<a.length;i+=4){var g=0.299*a[i]+0.587*a[i+1]+0.114*a[i+2];g=(g-128)*1.5+128;g=g<0?0:g>255?255:g;a[i]=a[i+1]=a[i+2]=g}
+      x.putImageData(d,0,0);URL.revokeObjectURL(url);
+      c.toBlob(function(b){b?res(b):rej(new Error('x'))},'image/png');
+    };
+    img.onerror=function(){rej(new Error('x'))};img.src=url;
+  });
+}
+async function ocrScan(blob,st){
+  try{
+    st.textContent='Loading text reader… (the first time can take a little while)';
+    if(!window.Tesseract)await loadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js');
+    var pb=await prep(blob);
+    var res=await Tesseract.recognize(pb,'eng',{logger:function(m){if(m.status==='recognizing text')st.textContent='Reading receipt… '+Math.round(m.progress*100)+'%'}});
+    var d=parseReceipt(res.data.text);
+    if(!d.items.length){st.textContent='Could not find any items. Try a flat, well-lit photo, or press Next to enter them yourself.';return;}
+    items=d.items;
+    if(d.sc!==null)$('sc').value=d.sc;
+    if(d.tx!==null)$('tx').value=d.tx;
+    st.textContent='Found '+d.items.length+' items. Please check names and prices on the next page.';
+    setTimeout(function(){go(1)},900);
+  }catch(e){
+    st.textContent='Could not read the photo here. Press Next to enter items yourself.';
+  }
+}
+var sample=null,canImg=false;
+if(window.claude&&claude.use){
+  claude.use('sample').then(function(s){
+    if(!s)return;sample=s;
+    return Promise.resolve(s.limits&&s.limits()).then(function(l){canImg=!!(l&&l.images)});
+  }).catch(function(){});
+}
+async function scan(file){
+  if(!file)return;
+  var st=$('status');
+  try{
+    var r=await shrink(file);
+    $('preview').src=r.url;$('preview').style.display='block';
+    if(!sample||!canImg){return ocrScan(r.blob,st);}
+    st.textContent='Reading receipt…';
+    var q='Read this restaurant receipt image. Return ONLY JSON, no markdown, in this exact shape: {"items":[{"name":"string","price":number}],"service_pct":number|null,"tax_pct":number|null}. '+
+      'Rules: one entry per line item; price is the TOTAL for that line (quantity already multiplied); put the quantity in the name like "2x Teh Tarik"; '+
+      'exclude subtotal, service charge, SST/tax, rounding and total lines; plain numbers only. service_pct and tax_pct are the percentages printed on the receipt, or null. If unreadable, return {"items":[]}.';
+    var out=await sample(q,{images:[r.blob],modelTier:'default'});
+    var t=(out&&out.text||'').replace(/```json|```/g,'').trim();
+    var d=JSON.parse(t.slice(t.indexOf('{'),t.lastIndexOf('}')+1));
+    var f=(d.items||[]).filter(function(i){return i&&isFinite(parseFloat(i.price))});
+    if(!f.length){st.textContent='Could not find any items. Try a clearer photo, or press Next to enter them yourself.';return;}
+    items=f.map(function(i){return {name:String(i.name||''),price:Math.round(parseFloat(i.price)*100)/100,who:null}});
+    if(isFinite(parseFloat(d.service_pct)))$('sc').value=parseFloat(d.service_pct);
+    if(isFinite(parseFloat(d.tax_pct)))$('tx').value=parseFloat(d.tax_pct);
+    st.textContent='Found '+f.length+' items.';
+    setTimeout(function(){go(1)},600);
+  }catch(e){
+    st.textContent='Scan failed'+(e&&e.code==='not_granted'?' (permission declined)':'')+'. Press Next to enter items yourself.';
+  }
+}
+$('upBtn').onclick=function(){$('upIn').click()};
+$('upIn').onchange=function(){scan(this.files[0]);this.value=''};
+$('theme').onclick=function(){var r=document.documentElement,d=r.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');r.setAttribute('data-theme',d==='dark'?'light':'dark')};
+function copyText(t){
+  function fb(){return new Promise(function(res,rej){var a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;opacity:0';document.body.appendChild(a);a.select();var ok=false;try{ok=document.execCommand('copy')}catch(e){}document.body.removeChild(a);ok?res():rej()})}
+  if(navigator.clipboard&&navigator.clipboard.writeText)return navigator.clipboard.writeText(t).catch(fb);
+  return fb();
+}
+$('copyBtn').onclick=function(){var b=this;copyText(shareText).then(function(){b.textContent='✓ Copied';setTimeout(function(){b.textContent='📋 Copy summary'},1800)}).catch(function(){b.textContent='Copy not available here'})};
+if(navigator.share){$('shareBtn').onclick=function(){navigator.share({text:shareText}).catch(function(){})}}else{$('shareBtn').style.display='none'}
+go(0);
+})();
+</script>
+</body>
+</html>
