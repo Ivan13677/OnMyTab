@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Keisha Wallet</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="theme-color" content="#ff9eb5">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Keisha Wallet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800&display=swap">
+<style>
+:root{--pink:#ff8fab;--peach:#ffc2a1;--bg:#fff6f2;--ink:#5a3942;--mute:#a58a8f;--line:#f6e1dc;--ok:#6fbf9a;--bad:#e5677d;--warn:#f0a15a}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:500 16px/1.4 Nunito,"Segoe UI",system-ui,sans-serif;padding:env(safe-area-inset-top) 0 110px}
+main{max-width:480px;margin:0 auto;padding:16px}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;border:0}
+:focus-visible{outline:3px solid var(--pink);outline-offset:2px}
+.hidden{display:none!important}
+.card{background:#fff;border-radius:22px;padding:16px;margin-top:14px;box-shadow:0 4px 18px rgba(255,143,171,.12)}
+h1{font-size:26px;margin:0;font-weight:800}
+h2{font-size:17px;margin:0 0 10px;font-weight:800}
+.mute{color:var(--mute);font-size:14px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.icon-btn{background:#fff;border-radius:50%;width:42px;height:42px;font-size:18px;box-shadow:0 4px 12px rgba(255,143,171,.18)}
+.seg{display:flex;background:#fff;border-radius:999px;padding:4px;margin-top:14px;box-shadow:0 4px 12px rgba(255,143,171,.12)}
+.seg button{flex:1;background:none;border-radius:999px;padding:9px;font-weight:700;color:var(--mute)}
+.seg button.on{background:linear-gradient(135deg,var(--pink),var(--peach));color:#fff}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:14px}
+.stat{background:#fff;border-radius:18px;padding:12px 8px;text-align:center;box-shadow:0 4px 12px rgba(255,143,171,.1)}
+.stat b{display:block;font-size:15px;font-weight:800;margin-top:2px}
+.stat.main{background:linear-gradient(135deg,var(--pink),var(--peach));color:#fff}
+.stat.main .mute{color:#fff}
+.bar{height:12px;background:var(--line);border-radius:99px;overflow:hidden;margin:8px 0}
+.bar i{display:block;height:100%;border-radius:99px;background:var(--ok);transition:width .4s}
+.nudge{font-size:15px;margin:6px 0 0}
+.donut{display:flex;gap:14px;align-items:center}
+.donut svg{width:150px;height:150px;flex:none}
+.legend{flex:1;font-size:14px;min-width:0}
+.legend div{display:flex;align-items:center;gap:6px;padding:2px 0}
+.legend div span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dot{width:10px;height:10px;border-radius:50%;flex:none}
+.jar-row{display:flex;gap:16px;align-items:center}
+.jar{width:60px;height:78px;border:3px solid var(--pink);border-radius:10px 10px 22px 22px;position:relative;overflow:hidden;flex:none;background:#fff}
+.jar i{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(var(--peach),var(--pink));transition:height .5s}
+.jar-row>div:last-child{flex:1}
+.row{display:flex;align-items:center;gap:10px;width:100%;background:none;text-align:left;padding:10px 0;border-bottom:1px solid var(--line)}
+.row:last-child{border:0}
+.row .t{flex:1;min-width:0}
+.row .t b{display:block;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.amt{font-weight:800;white-space:nowrap}
+.in{color:var(--ok)}.jarc{color:var(--pink)}
+.fab{position:fixed;right:max(16px,calc(50% - 224px));bottom:calc(20px + env(safe-area-inset-bottom));background:linear-gradient(135deg,var(--pink),var(--peach));color:#fff;border-radius:999px;padding:15px 24px;font-weight:800;box-shadow:0 8px 22px rgba(255,143,171,.5)}
+.link{background:none;color:var(--pink);font-weight:700;padding:4px 0}
+.shade{position:fixed;inset:0;background:rgba(90,57,66,.4);display:flex;align-items:flex-end;justify-content:center;z-index:5}
+.sheet{background:#fff;width:100%;max-width:480px;border-radius:26px 26px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom));max-height:92vh;overflow:auto;animation:up .25s}
+@keyframes up{from{transform:translateY(40px);opacity:0}}
+@media (prefers-reduced-motion:reduce){.sheet{animation:none}.bar i,.jar i{transition:none}}
+label{display:block;font-weight:700;font-size:14px;margin:12px 0 4px}
+input,select{width:100%;padding:12px 14px;border:2px solid var(--line);border-radius:14px;background:#fff}
+input:focus,select:focus{border-color:var(--pink);outline:0}
+.btn{width:100%;padding:14px;border-radius:16px;font-weight:800;margin-top:16px;background:linear-gradient(135deg,var(--pink),var(--peach));color:#fff}
+.btn.ghost{background:#fff;color:var(--mute);margin-top:6px}
+.btn.del{background:#fff;color:var(--bad);margin-top:6px}
+.err{color:var(--bad);font-size:14px;min-height:20px;margin-top:8px}
+.auth{text-align:center;padding-top:60px}
+.auth .logo{font-size:46px}
+.nav{display:flex;align-items:center;gap:6px;margin-top:2px}.nb{background:#fff;color:var(--pink);border-radius:50%;width:30px;height:30px;font-size:20px;line-height:1;padding:0;box-shadow:0 2px 8px rgba(255,143,171,.2)}.nb:disabled{opacity:.3;cursor:default}
+.hint{font-size:13px;color:var(--mute);margin-top:4px}
+.pinkcard{background:linear-gradient(135deg,#ffe1e8,#ffd8c4);border-radius:26px;padding:16px;margin-top:14px}
+.pc-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.pc-top>div{display:flex;align-items:center;gap:10px;font-weight:800;font-size:17px}
+.pill{background:rgba(255,255,255,.75);border-radius:999px;padding:5px 12px;font-size:13px;font-weight:700}
+.pc-bar{height:14px;background:rgba(255,255,255,.75);border-radius:99px;overflow:hidden;margin:14px 0 12px}
+.pc-bar i{display:block;width:0;height:100%;border-radius:99px;transition:width .9s cubic-bezier(.2,.8,.2,1),background .3s}
+.pc-row{display:flex;justify-content:space-between;align-items:flex-end;gap:10px}
+.pc-row .mute{color:#9a7078}
+.big{font-size:32px;font-weight:800;line-height:1}
+.chip{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;flex:none;color:#fff}
+.chip svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.mini{background:#fff;border-radius:22px;padding:14px;box-shadow:0 4px 14px rgba(255,143,171,.12)}
+.mini h3{margin:8px 0 0;font-size:17px;font-weight:800}
+.mini .bar{margin:10px 0}
+.mini .bar i{background:linear-gradient(90deg,var(--pink),var(--peach))}
+.mini p{margin:2px 0;font-size:14px}
+.pills{display:flex;gap:10px;margin-top:12px}
+.pillbtn{flex:1;background:#fff;border-radius:999px;padding:13px;font-weight:800;color:var(--pink);box-shadow:0 4px 12px rgba(255,143,171,.15)}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tile{background:var(--bg);border-radius:16px;padding:10px;display:flex;flex-direction:column;gap:3px;min-width:0}
+.tile .mute{font-size:12px}.tile b{font-size:14px;font-weight:800;overflow:hidden;text-overflow:ellipsis}
+.plot{position:relative;margin-top:26px}
+.cols{display:flex;gap:8px}
+.col{flex:1;background:none;padding:0;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0}
+.bw{height:120px;width:100%;display:flex;align-items:flex-end}
+.b{width:100%;border-radius:14px;background:#ffe3ea;min-height:8px;transition:height .4s}
+.col.on .b{background:linear-gradient(var(--pink),var(--peach))}
+.col span{font-size:13px;font-weight:700;color:var(--mute)}.col.on span{color:var(--ink)}
+.avg{position:absolute;left:0;right:0;border-top:2px dashed var(--pink);pointer-events:none}
+.avg em{position:absolute;right:0;top:-20px;font-size:12px;font-style:normal;font-weight:700;color:var(--pink)}
+.ring{position:relative;width:240px;max-width:100%;aspect-ratio:1;margin:6px auto 0}
+.ring svg{width:100%;height:100%}
+.ring .ctr{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+.ring>.chip{position:absolute;width:30px;height:30px;border-radius:50%;transform:translate(-50%,-50%);border:2px solid #fff}
+.ring>.chip svg{width:15px;height:15px}
+.gs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:18px;text-align:center}
+.g{width:70px;height:70px;margin:0 auto 6px}.g svg{width:100%;height:100%;transform:rotate(-90deg)}
+.gs .mute{display:block;font-size:13px}.gs b{font-size:15px;font-weight:800}
+#app{position:fixed;top:env(safe-area-inset-top,0px);left:0;right:0;bottom:0;max-width:480px;margin:0 auto}
+.pager{height:100%;display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain}
+.pager::-webkit-scrollbar{display:none}
+.page{flex:0 0 100%;scroll-snap-align:start;scroll-snap-stop:always;overflow-y:auto;padding:16px 16px calc(100px + env(safe-area-inset-bottom))}
+.tabs{position:fixed;left:0;right:0;bottom:0;max-width:480px;margin:0 auto;display:flex;background:#fff;border-radius:22px 22px 0 0;padding:8px 8px calc(8px + env(safe-area-inset-bottom));box-shadow:0 -6px 20px rgba(255,143,171,.18);z-index:3}
+.tabs button{flex:1;background:none;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12px;font-weight:700;color:var(--mute);padding:6px}
+.tabs button.on{color:var(--pink)}
+.tabs svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.hero{background:linear-gradient(135deg,var(--pink),var(--peach));color:var(--ink);border-radius:26px;padding:20px;margin-top:14px}
+.hero .mute{color:var(--ink);opacity:.8}
+.huge{font-size:36px;font-weight:800;line-height:1.1;margin:2px 0 12px}
+.hr{height:1px;background:rgba(255,255,255,.7);margin-bottom:10px}
+.acts{display:flex;gap:8px;margin-top:12px}
+.acts button{flex:1;background:#fff;border-radius:999px;padding:13px 6px;font-weight:800;color:var(--pink);box-shadow:0 4px 12px rgba(255,143,171,.15)}
+.stage{position:relative;width:170px;height:280px;margin:10px auto 8px}
+.bigjar{position:absolute;left:10px;bottom:0;width:150px;height:190px;border:4px solid var(--pink);border-radius:14px 14px 40px 40px;overflow:hidden;background:#fff}
+.bigjar i{position:absolute;left:0;right:0;bottom:0;height:var(--h,0%);background:linear-gradient(var(--peach),var(--pink))}
+.lid{position:absolute;left:30px;bottom:188px;width:110px;height:12px;border-radius:8px;background:var(--pink)}
+.coin{position:absolute;top:0;left:var(--x);width:24px;height:24px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff3c4,#f2b84b);border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.12);opacity:0}
+.play .coin{animation:drop 1.3s ease-in var(--d) both}
+.play .bigjar i{animation:fillUp 1.6s ease-out}
+@keyframes drop{0%{transform:translateY(0);opacity:0}15%{opacity:1}75%{opacity:1}100%{transform:translateY(190px);opacity:0}}
+@keyframes fillUp{from{height:0}}
+@media (prefers-reduced-motion:reduce){.play .coin,.play .bigjar i{animation:none}}
+@keyframes ringIn{from{stroke-dasharray:0 100}}
+@keyframes barUp{from{height:0}}
+.play2 .g circle:last-child,.play2 .ring svg circle:not(:first-child){animation:ringIn 1s cubic-bezier(.2,.8,.2,1) both}
+.play2 .b{animation:barUp .9s cubic-bezier(.2,.8,.2,1) both}
+@media (prefers-reduced-motion:reduce){.play2 .g circle,.play2 .ring svg circle,.play2 .b{animation:none}.pc-bar i{transition:none}}
+</style>
+</head>
+<body>
+<main>
+
+<!-- Sign in / register -->
+<section id="auth" class="hidden auth">
+  <h1>Keisha Wallet</h1>
+  <p class="mute" id="authSub">Welcome back. Log in to see your wallet.</p>
+  <div class="card" style="text-align:left">
+    <label for="user">Username</label>
+    <input id="user" autocomplete="username" autocapitalize="none" placeholder="e.g. keisha">
+    <label for="pass">Password</label>
+    <input id="pass" type="password" autocomplete="current-password" placeholder="At least 6 characters">
+    <div class="err" id="authErr" role="alert"></div>
+    <button class="btn" id="authBtn">Log in</button>
+    <button class="link" id="authSwap" style="margin-top:10px;width:100%">First time here? Create your account</button>
+  </div>
+</section>
+
+<!-- Setup notice -->
+<section id="setup" class="hidden card">
+  <h2>One more step</h2>
+  <p>Paste your Firebase details into <b>firebaseConfig</b> near the bottom of index.html, then reload this page.</p>
+</section>
+
+<!-- App -->
+<section id="app" class="hidden"><div class="pager" id="pager">
+<div class="page" id="p1">
+  <div class="top"><div><h1 id="greet"></h1><div class="mute" id="period0"></div></div><button class="icon-btn" id="setB" aria-label="Settings">&#9881;</button></div>
+  <div class="hero"><div class="mute">Total balance</div><div class="huge" id="total"></div><div class="hr"></div><div class="top"><span class="mute">This month's balance</span><b id="monthBal"></b></div></div>
+  <div class="pinkcard">
+    <div class="pc-top"><div><span class="chip" style="background:#fff;color:var(--pink)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4zM4 7V6a2 2 0 0 1 2-2h10M16 13.5h4"/></svg></span>Spending</div><span class="pill" id="lim"></span></div>
+    <div class="pc-bar"><i id="bar"></i></div>
+    <div class="pc-row"><div><div><b id="pcSpent"></b> <span class="mute">spent</span></div><div><b id="pcBud"></b> <span class="mute">budgeted</span></div></div><div style="text-align:right"><div class="big" id="pcPct"></div><div class="mute" id="pcLbl"></div></div></div>
+    <p class="nudge" id="nudge"></p>
+  </div>
+  <div class="acts"><button data-t="out">- Expense</button><button data-t="in">+ Money in</button><button data-t="jar">To jar</button></div>
+  <div class="card"><h2>Activity</h2><div id="list"></div></div>
+</div>
+<div class="page" id="p2">
+  <div class="top"><div><h1>Insights</h1><div class="mute" id="period"></div></div></div>
+  <p class="mute" id="carry" style="margin:8px 0 0"></p>
+  <div class="card"><h2>Where your money goes</h2><div id="donut"></div><div class="gs" id="gauges"></div></div>
+  <div class="card"><h2>Categories</h2><div id="cats"></div></div>
+  <div class="card"><h2>Months</h2><div class="tiles" id="tiles"></div><div id="chart"></div></div>
+</div>
+<div class="page" id="p3">
+  <div class="top"><div><h1>Savings jar</h1><div class="mute" id="jarGoal"></div></div></div>
+  <div class="card" style="text-align:center">
+    <div class="stage" id="stage" style="--h:0%"><div class="coin" style="--x:40px;--d:0s"></div><div class="coin" style="--x:75px;--d:0.15s"></div><div class="coin" style="--x:110px;--d:0.3s"></div><div class="coin" style="--x:130px;--d:0.45s"></div><div class="coin" style="--x:58px;--d:0.6s"></div><div class="coin" style="--x:95px;--d:0.75s"></div><div class="lid"></div><div class="bigjar"><i></i></div></div>
+    <b id="jarAmt" style="font-size:20px"></b><div class="mute" id="jarPct"></div>
+    <p class="nudge" id="jarMsg"></p>
+    <button class="btn" id="jarAdd">Add to jar</button>
+    <button class="link" id="goalBtn" style="margin-top:8px"></button>
+  </div>
+</div>
+</div></section>
+</main>
+
+<nav class="tabs hidden" id="tabs" aria-label="Pages"><button class="on"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-7 8 7v9H4zM10 20v-6h4v6"/></svg>Home</button><button><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20V10M12 20V4M19 20v-7"/></svg>Insights</button><button><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4h8M9 4v3c-2 1-3 3-3 5v6a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-6c0-2-1-4-3-5V4"/></svg>Jar</button></nav>
+
+<!-- Add / edit sheet -->
+<div class="shade hidden" id="txShade">
+  <div class="sheet" role="dialog" aria-label="Add entry">
+    <h2 id="txTitle">Add entry</h2>
+    <div class="seg" style="margin-top:0">
+      <button data-t="out" class="on">Expense</button>
+      <button data-t="in">Money in</button>
+      <button data-t="jar">To jar</button>
+    </div>
+    <label for="amt">Amount (RM)</label>
+    <input id="amt" autocomplete="off" inputmode="decimal" placeholder="0.00">
+    <div id="catWrap">
+      <label for="cat">Category</label>
+      <select id="cat"></select>
+      <input id="newCat" autocomplete="off" class="hidden" placeholder="New category name" style="margin-top:8px">
+    </div>
+    <label for="note">Note (optional)</label>
+    <input id="note" autocomplete="off" placeholder="e.g. lunch with friends">
+    <label for="date">Date</label>
+    <input id="date" type="date">
+    <div class="err" id="txErr" role="alert"></div>
+    <button class="btn" id="txSave">Save</button>
+    <button class="btn del hidden" id="txDel">Delete entry</button>
+    <button class="btn ghost" data-close>Cancel</button>
+  </div>
+</div>
+
+<!-- Settings sheet -->
+<div class="shade hidden" id="setShade">
+  <div class="sheet" role="dialog" aria-label="Settings">
+    <h2>Settings</h2>
+    <label for="limit">Monthly spending limit (RM)</label>
+    <input id="limit" autocomplete="off" inputmode="decimal" placeholder="e.g. 1000">
+    <label for="gName">Savings goal name</label>
+    <input id="gName" autocomplete="off" placeholder="e.g. Trip to Langkawi">
+    <label for="gTarget">Savings goal amount (RM)</label>
+    <input id="gTarget" autocomplete="off" inputmode="decimal" placeholder="e.g. 1500">
+    <div class="err" id="setErr" role="alert"></div>
+    <button class="btn" id="setSave">Save settings</button>
+    <button class="btn del" id="logout">Log out</button>
+    <button class="btn ghost" data-close>Cancel</button>
+  </div>
+</div>
+
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {getAuth,createUserWithEmailAndPassword,signInWithEmailAndPassword,signOut,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {getFirestore,doc,collection,onSnapshot,setDoc,addDoc,deleteDoc} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+/* ====== PASTE YOUR FIREBASE CONFIG HERE ====== */
+const firebaseConfig = {
+  apiKey: "AIzaSyDpMRFZdLrhTs7moe0wuOg-xn6sKoTubIM",
+  authDomain: "keisha-wallent.firebaseapp.com",
+  projectId: "keisha-wallent",
+  appId: "1:1061786403425:web:046182f28aa61522232020"
+};
+/* ============================================= */
+
+const $ = id => document.getElementById(id);
+const show = (id, on = true) => $(id).classList.toggle("hidden", !on);
+const DEFAULT_CATS = ["Food", "Misc", "Transport", "Shopping", "Bills"];
+const COLORS = ["#ff8fab", "#ffa07a", "#e87fa6", "#f4a259", "#d86fa0", "#f08a7a", "#c96b9a", "#ee9b6e"];
+const S = {uid: null, tx: [], cfg: {limit: 0, cats: [], gName: "", gTarget: 0}, offset: 0, type: "out", editId: null, register: false};
+const rm = n => "RM " + Number(n).toLocaleString("en-MY", {minimumFractionDigits: 2, maximumFractionDigits: 2});
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
+const toDate = s => new Date(s + "T00:00:00");
+/* ---------- Count-up numbers ---------- */
+const REDUCE = matchMedia("(prefers-reduced-motion:reduce)").matches;
+function tween(el, to, fmt, from = 0, dur = 1000) {
+  cancelAnimationFrame(el._raf); el._to = to; el._fmt = fmt;
+  if (REDUCE || from === to) { el._cur = to; el.textContent = fmt(to); return; }
+  el.textContent = fmt(from);
+  const t0 = performance.now();
+  const step = now => {
+    const p = Math.min((now - t0) / dur, 1);
+    el._cur = from + (to - from) * (1 - Math.pow(1 - p, 3));
+    el.textContent = fmt(p < 1 ? el._cur : to);
+    if (p < 1) el._raf = requestAnimationFrame(step);
+  };
+  el._raf = requestAnimationFrame(step);
+}
+function setNum(id, to, fmt, alt = "") {
+  const el = $(id);
+  if (to == null) { cancelAnimationFrame(el._raf); el._cur = 0; el._to = null; el.textContent = alt; return; }
+  tween(el, to, fmt, el._cur || 0);
+}
+const replayNum = id => { const el = $(id); if (el._to != null) tween(el, el._to, el._fmt, 0); };
+const iso = d => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+
+if (firebaseConfig.apiKey.startsWith("PASTE")) { show("setup"); throw new Error("Firebase config missing"); }
+const app = initializeApp(firebaseConfig), auth = getAuth(app), db = getFirestore(app);
+
+/* ---------- Login / register ---------- */
+const emailOf = u => u.trim().toLowerCase().replace(/[^a-z0-9._-]/g, "") + "@keishawallet.app";
+function authMode(reg) {
+  S.register = reg;
+  $("authBtn").textContent = reg ? "Create account" : "Log in";
+  $("authSwap").textContent = reg ? "Already have an account? Log in" : "First time here? Create your account";
+  $("authSub").textContent = reg ? "Pick a username and password to get started." : "Welcome back. Log in to see your wallet.";
+  $("pass").autocomplete = reg ? "new-password" : "current-password";
+  $("authErr").textContent = "";
+}
+$("authSwap").onclick = () => authMode(!S.register);
+$("authBtn").onclick = async () => {
+  const u = $("user").value, p = $("pass").value;
+  if (!/[a-z0-9]/i.test(u)) { $("authErr").textContent = "Enter a username using letters or numbers."; return; }
+  try {
+    S.register ? await createUserWithEmailAndPassword(auth, emailOf(u), p) : await signInWithEmailAndPassword(auth, emailOf(u), p);
+  } catch (e) {
+    const m = {"auth/email-already-in-use": "That username is taken. Try another one.", "auth/weak-password": "Password needs at least 6 characters.",
+      "auth/invalid-credential": "Wrong username or password.", "auth/user-not-found": "No account with that username.",
+      "auth/wrong-password": "Wrong username or password.", "auth/too-many-requests": "Too many tries. Wait a moment and try again."};
+    $("authErr").textContent = m[e.code] || "Could not log in. Check your connection and try again.";
+  }
+};
+$("logout").onclick = async () => { await signOut(auth); location.reload(); };
+
+onAuthStateChanged(auth, user => {
+  if (!user) { show("app", false); show("tabs", false); show("auth"); authMode(false); return; }
+  S.uid = user.uid; show("auth", false); show("app"); show("tabs");
+  onSnapshot(collection(db, "users", S.uid, "tx"), snap => { S.tx = snap.docs.map(d => ({id: d.id, ...d.data()})); render(); });
+  onSnapshot(doc(db, "users", S.uid, "meta", "settings"), snap => { Object.assign(S.cfg, snap.data() || {}); render(); });
+});
+
+/* ---------- Dates and periods ---------- */
+function greeting() {
+  const h = new Date().getHours();
+  if (h >= 5 && h < 12) return "Good Morning Keisha \u{1F495}";
+  if (h >= 12 && h < 15) return "Good Afternoon Keisha \u{1F495}";
+  if (h >= 15 && h < 21) return "Good Evening Keisha \u{1F495}";
+  if (h >= 21 || h < 2) return "Good Night Keisha \u{1F495}";
+  return "Why your not sleeping harrr Keisha";
+}
+function period(o = S.offset) {
+  const n = new Date(), y = n.getFullYear(), m = n.getMonth() - o, a = new Date(y, m, 1);
+  return {a, b: new Date(y, m + 1, 1), label: a.toLocaleDateString("en-MY", {month: "long", year: "numeric"}), when: o ? "that month" : "this month"};
+}
+
+/* ---------- Render ---------- */
+const svgI = p => `<svg viewBox="0 0 24 24" aria-hidden="true">${p}</svg>`;
+const ICON = {
+  Food: '<path d="M4 11h16a8 8 0 0 1-16 0zM8 4c0 2 2 2 2 4M14 4c0 2 2 2 2 4"/>',
+  Transport: '<path d="M4 16v-5l2-5h12l2 5v5zM4 16v3h3v-3M17 16v3h3v-3M4 11h16"/>',
+  Shopping: '<path d="M5 8h14l-1 12H6zM9 8a3 3 0 0 1 6 0"/>',
+  Bills: '<path d="M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6"/>',
+  Misc: '<path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6-5.4-3-5.4 3 1.2-6L3.3 9.3l6.1-.7z"/>',
+  wallet: '<path d="M4 7h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4zM4 7V6a2 2 0 0 1 2-2h10M16 13.5h4"/>',
+  jar: '<path d="M8 4h8M9 4v3c-2 1-3 3-3 5v6a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-6c0-2-1-4-3-5V4"/>'
+};
+const chipOf = (key, bg) => `<span class="chip" style="background:${bg}">${svgI(ICON[key] || ICON.Misc)}</span>`;
+const within = (t, a, b) => { const d = toDate(t.date); return d >= a && d < b; };
+function calc(P) {
+  const inP = S.tx.filter(t => within(t, P.a, P.b)).sort((x, y) => y.date.localeCompare(x.date));
+  const sum = type => inP.filter(t => t.type === type).reduce((s, t) => s + t.amount, 0);
+  const by = {}; inP.filter(t => t.type === "out").forEach(t => by[t.cat] = (by[t.cat] || 0) + t.amount);
+  const income = sum("in"), spent = sum("out"), jarIn = sum("jar");
+  return {inP, income, spent, jarIn, left: income - spent - jarIn, by, rows: Object.entries(by).sort((x, y) => y[1] - x[1]), bills: by.Bills || 0};
+}
+function render() {
+  if (!S.uid) return;
+  const allCats = [...DEFAULT_CATS, ...(S.cfg.cats || [])], colorOf = c => COLORS[Math.max(allCats.indexOf(c), 0) % COLORS.length];
+  const P0 = period(0), H = calc(P0), P = period(S.offset), V = calc(P), {rows, spent, income, left, bills} = V;
+  const total = S.tx.reduce((s, t) => s + (t.type === "in" ? t.amount : -t.amount), 0);
+  const saved = S.tx.filter(t => t.type === "jar").reduce((s, t) => s + t.amount, 0); S.saved = saved;
+  $("greet").textContent = greeting();
+
+  // Page 1: Home
+  $("period0").textContent = P0.label;
+  setNum("total", total, rm);
+  setNum("monthBal", H.left, rm);
+  const limit = S.cfg.limit, pct = limit ? H.spent / limit : 0, used = Math.round(pct * 100);
+  $("lim").textContent = limit ? "Limit: " + rm(limit) + "/month" : "No limit set";
+  $("bar").style.width = Math.min(pct * 100, 100) + "%";
+  $("bar").style.background = pct >= 1 ? "var(--bad)" : pct >= .8 ? "var(--warn)" : "var(--pink)";
+  setNum("pcSpent", H.spent, rm);
+  setNum("pcBud", limit || null, rm, "Not set");
+  setNum("pcPct", limit ? used : null, v => Math.round(v) + "%", "-");
+  $("pcLbl").textContent = !limit ? "No limit yet" : pct >= 1 ? "Over spending budget" : "of budget used";
+  $("nudge").textContent = !limit ? "Set a spending limit in settings and I will cheer you on."
+    : pct >= 1 ? "Oops, you went over your limit this month. It happens. A fresh start is just around the corner."
+    : pct >= .8 ? "Careful, Keisha. " + used + "% of your limit is gone, so be gentle with your wallet."
+    : "You are doing lovely. Plenty of room left in your budget.";
+  $("list").innerHTML = H.inP.length ? H.inP.map(t => {
+    const sign = t.type === "in" ? "+" : "-", cls = t.type === "in" ? "in" : t.type === "jar" ? "jarc" : "";
+    const name = t.type === "in" ? "Money in" : t.type === "jar" ? "Savings jar" : t.cat;
+    const lead = t.type === "out" ? chipOf(t.cat, colorOf(t.cat)) : chipOf(t.type === "jar" ? "jar" : "wallet", t.type === "in" ? "#6fbf9a" : "#e87fa6");
+    return `<button class="row" data-id="${t.id}">${lead}<div class="t"><b>${esc(name)}${t.note ? " - " + esc(t.note) : ""}</b><span class="mute">${toDate(t.date).toLocaleDateString("en-MY", {day: "numeric", month: "short"})}</span></div><span class="amt ${cls}">${sign}${rm(t.amount)}</span></button>`;
+  }).join("") : '<p class="mute" style="margin:0">Nothing this month yet. Tap Expense or Money in to start.</p>';
+  document.querySelectorAll(".row[data-id]").forEach(r => r.onclick = () => openTx(r.dataset.id));
+
+  // Page 2: Insights
+  $("period").textContent = P.label;
+  const pv = new Date(P.a.getFullYear(), P.a.getMonth() - 1, 1), pvT = S.tx.filter(t => within(t, pv, P.a));
+  const pl = pvT.reduce((s, t) => s + (t.type === "in" ? t.amount : -t.amount), 0), pn = pv.toLocaleDateString("en-MY", {month: "long"});
+  $("carry").textContent = pvT.length ? (pl >= 0 ? pn + " money left: " + rm(pl) : pn + " ended " + rm(-pl) + " below zero") : "";
+  let svg = '<svg viewBox="0 0 42 42" role="img" aria-label="Spending by category"><circle cx="21" cy="21" r="15.915" fill="none" stroke="#f6e1dc" stroke-width="5"/>', cum = 0, chips = "";
+  rows.forEach(([c, v]) => {
+    const p = v / spent * 100, ang = (cum + p / 2) / 100 * 2 * Math.PI - Math.PI / 2;
+    svg += `<circle cx="21" cy="21" r="15.915" fill="none" stroke="${colorOf(c)}" stroke-width="5" stroke-dasharray="${p} ${100 - p}" stroke-dashoffset="${25 - cum}"/>`;
+    if (p >= 6) chips += `<span class="chip" style="background:${colorOf(c)};left:${50 + 37.9 * Math.cos(ang)}%;top:${50 + 37.9 * Math.sin(ang)}%">${svgI(ICON[c] || ICON.Misc)}</span>`;
+    cum += p;
+  });
+  $("donut").innerHTML = `<div class="ring">${svg}</svg><div class="ctr"><span class="mute">Total spend</span><b style="font-size:24px" data-count="${spent}" data-fmt="rm">${rm(spent)}</b></div>${chips}</div>`;
+  const gauge = (p, col, label, val) => { p = Math.max(0, Math.min(p, 100)); return `<div><div class="g"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15.915" fill="none" stroke="#f6e1dc" stroke-width="4"/><circle cx="18" cy="18" r="15.915" fill="none" stroke="${col}" stroke-width="4" stroke-linecap="${p > 0 ? "round" : "butt"}" stroke-dasharray="${p} 100"/></svg></div><span class="mute">${label}</span><b data-count="${val}" data-fmt="rm">${rm(val)}</b></div>`; };
+  $("gauges").innerHTML = gauge(income ? 100 : 0, "#ff8fab", "Income", income) + gauge(income ? spent / income * 100 : 0, "#ffa07a", "Spending", spent) + gauge(income ? left / income * 100 : 0, "#e87fa6", "Net Balance", left);
+  const f = d => d.toLocaleDateString("en-MY", {day: "numeric", month: "short"}), rng = f(P.a) + " to " + f(new Date(P.b - 864e5));
+  $("cats").innerHTML = rows.length ? rows.map(([c, v]) => `<div class="row">${chipOf(c, colorOf(c))}<div class="t"><b>${esc(c)}</b><span class="mute">${rng}</span></div><div style="text-align:right"><b data-count="${v}" data-fmt="rm">${rm(v)}</b><div class="mute">${Math.round(v / spent * 100)}% of spending</div></div></div>`).join("")
+    : '<p class="mute" style="margin:0">No spending this month yet.</p>';
+  const now = new Date(), ms = [];
+  for (let o = 5; o >= 0; o--) {
+    const a = new Date(now.getFullYear(), now.getMonth() - o, 1), b = new Date(a.getFullYear(), a.getMonth() + 1, 1);
+    ms.push({o, a, v: S.tx.filter(t => t.type === "out" && within(t, a, b)).reduce((s, t) => s + t.amount, 0)});
+  }
+  const mx = Math.max(...ms.map(m => m.v), 1), act = ms.filter(m => m.v > 0), avg = act.length ? act.reduce((s, m) => s + m.v, 0) / act.length : 0;
+  $("tiles").innerHTML = [["Bills", bills, chipOf("Bills", "#ffa07a")], ["Amount Spent", spent, chipOf("wallet", "#ff8fab")], ["Savings Goal", saved, chipOf("jar", "#e87fa6")]]
+    .map(([l, v, c]) => `<div class="tile">${c}<span class="mute">${l}</span><b data-count="${v}" data-fmt="rm">${rm(v)}</b></div>`).join("");
+  $("chart").innerHTML = `<div class="plot">${avg ? `<div class="avg" style="top:${120 - avg / mx * 120}px"><em>avg ${rm(avg)}</em></div>` : ""}<div class="cols">` +
+    ms.map(m => `<button class="col${m.o === S.offset ? " on" : ""}" data-o="${m.o}" aria-label="${m.a.toLocaleDateString("en-MY", {month: "long"})}, spent ${rm(m.v)}"><div class="bw"><div class="b" style="height:${m.v / mx * 100}%"></div></div><span>${m.a.toLocaleDateString("en-MY", {month: "short"})}</span></button>`).join("") + "</div></div>";
+  document.querySelectorAll(".col").forEach(c => c.onclick = () => { S.offset = +c.dataset.o; render(); });
+
+  // Page 3: Jar
+  const tgt = S.cfg.gTarget || 0, jp = tgt ? Math.min(saved / tgt * 100, 100) : 0;
+  $("stage").style.setProperty("--h", jp + "%");
+  $("jarGoal").textContent = S.cfg.gName || "No goal yet";
+  setNum("jarAmt", saved, v => tgt ? rm(v) + " of " + rm(tgt) : rm(v) + " saved");
+  setNum("jarPct", tgt ? jp : null, v => Math.round(v) + "% there", "");
+  $("goalBtn").textContent = S.cfg.gName ? "Change goal" : "Set a savings goal";
+
+  // Category dropdown
+  const cur = $("cat").value;
+  $("cat").innerHTML = allCats.map(c => `<option>${esc(c)}</option>`).join("") + '<option value="__new">+ New category</option>';
+  if (allCats.includes(cur)) $("cat").value = cur;
+}
+
+/* ---------- Pages and jar animation ---------- */
+const MSGS = ["Plink! Every coin counts, Keisha.", "Look at that jar fill up.", "Small savings, big dreams.", "Your future self says thank you."];
+function playInsights() {
+  const pg = $("p2"); pg.classList.remove("play2"); void pg.offsetWidth; pg.classList.add("play2");
+  pg.querySelectorAll("[data-count]").forEach(el => tween(el, +el.dataset.count, rm, 0));
+}
+function playJar() {
+  const st = $("stage"); st.classList.remove("play"); void st.offsetWidth; st.classList.add("play"); replayNum("jarAmt"); replayNum("jarPct");
+  $("jarMsg").textContent = S.cfg.gTarget && S.saved >= S.cfg.gTarget ? "You did it, Keisha. Your jar is full!" : MSGS[Math.floor(Math.random() * MSGS.length)];
+}
+const pager = $("pager"), tabBtns = [...document.querySelectorAll("#tabs button")];
+const curPage = () => Math.round(pager.scrollLeft / pager.clientWidth);
+const goPage = i => pager.scrollTo({left: i * pager.clientWidth, behavior: "smooth"});
+let lastPage = 0;
+pager.addEventListener("scroll", () => {
+  const i = curPage(); if (i === lastPage) return; lastPage = i;
+  tabBtns.forEach((b, k) => b.classList.toggle("on", k === i));
+  if (i === 1) playInsights();
+  if (i === 2) playJar();
+}, {passive: true});
+tabBtns.forEach((b, k) => b.onclick = () => goPage(k));
+document.querySelectorAll(".acts button").forEach(b => b.onclick = () => openTx(null, b.dataset.t));
+$("jarAdd").onclick = () => openTx(null, "jar");
+$("goalBtn").onclick = () => openSettings();
+
+/* ---------- Add / edit sheet ---------- */
+function setType(t) {
+  S.type = t;
+  document.querySelectorAll("#txShade .seg button").forEach(b => b.classList.toggle("on", b.dataset.t === t));
+  show("catWrap", t === "out");
+}
+document.querySelectorAll("#txShade .seg button").forEach(b => b.onclick = () => setType(b.dataset.t));
+$("cat").onchange = () => { show("newCat", $("cat").value === "__new"); if ($("cat").value === "__new") $("newCat").focus(); };
+function openTx(id, preset) {
+  const t = S.tx.find(x => x.id === id);
+  S.editId = t ? id : null;
+  $("txTitle").textContent = t ? "Edit entry" : "Add entry";
+  setType(t ? t.type : (preset || "out"));
+  $("amt").value = t ? t.amount : "";
+  $("note").value = t ? t.note || "" : "";
+  $("date").value = t ? t.date : iso(new Date());
+  $("newCat").value = ""; show("newCat", false);
+  if (t && t.cat) $("cat").value = t.cat;
+  $("txErr").textContent = "";
+  show("txDel", !!t); show("txShade");
+  if (!t) $("amt").focus();
+}
+$("txSave").onclick = async () => {
+  const amount = parseFloat($("amt").value.replace(",", "."));
+  if (!(amount > 0)) { $("txErr").textContent = "Enter an amount greater than 0."; return; }
+  if (!$("date").value) { $("txErr").textContent = "Pick a date."; return; }
+  let cat = $("cat").value;
+  if (S.type === "out" && cat === "__new") {
+    cat = $("newCat").value.trim();
+    if (!cat) { $("txErr").textContent = "Type a name for the new category."; return; }
+    if (![...DEFAULT_CATS, ...(S.cfg.cats || [])].some(c => c.toLowerCase() === cat.toLowerCase()))
+      await setDoc(doc(db, "users", S.uid, "meta", "settings"), {cats: [...(S.cfg.cats || []), cat]}, {merge: true});
+  }
+  const data = {type: S.type, amount: Math.round(amount * 100) / 100, cat: S.type === "out" ? cat : "", note: $("note").value.trim(), date: $("date").value};
+  try {
+    S.editId ? await setDoc(doc(db, "users", S.uid, "tx", S.editId), data) : await addDoc(collection(db, "users", S.uid, "tx"), data);
+    show("txShade", false);
+    if (S.type === "jar") { curPage() === 2 ? playJar() : goPage(2); }
+  } catch (e) { $("txErr").textContent = "Could not save. Check your connection and try again."; }
+};
+$("txDel").onclick = async () => {
+  if (!confirm("Delete this entry?")) return;
+  await deleteDoc(doc(db, "users", S.uid, "tx", S.editId)); show("txShade", false);
+};
+
+/* ---------- Settings ---------- */
+function openSettings() {
+  $("limit").value = S.cfg.limit || ""; $("gName").value = S.cfg.gName || ""; $("gTarget").value = S.cfg.gTarget || "";
+  $("setErr").textContent = ""; show("setShade");
+}
+$("setB").onclick = openSettings;
+$("setSave").onclick = async () => {
+  const num = v => parseFloat(String(v).replace(",", ".")) || 0;
+  const limit = num($("limit").value), gTarget = num($("gTarget").value), gName = $("gName").value.trim();
+  if (gName && !(gTarget > 0)) { $("setErr").textContent = "Add an amount for your savings goal."; return; }
+  try { await setDoc(doc(db, "users", S.uid, "meta", "settings"), {limit, gName, gTarget}, {merge: true}); show("setShade", false); }
+  catch (e) { $("setErr").textContent = "Could not save. Check your connection and try again."; }
+};
+
+/* ---------- Close sheets ---------- */
+document.querySelectorAll("[data-close]").forEach(b => b.onclick = () => { show("txShade", false); show("setShade", false); });
+document.querySelectorAll(".shade").forEach(s => s.onclick = e => { if (e.target === s) s.classList.add("hidden"); });
+</script>
+</body>
+</html>
